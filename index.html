@@ -4,27 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Performer HQ Clock</title>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600&family=IBM+Plex+Sans:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --tile:#4949E9;      /* Cool Blue */
-    --tile2:#3D3DD6;     /* lower half, a touch deeper */
-    --digit:#F1F1F1;     /* Grey Dover */
-    --label:#ACC3FF;     /* Baby Blue */
-    --hinge:#20284A;     /* Dark Blue */
-  }
-  html,body{margin:0;height:100%;background:transparent;}
-  body{display:flex;justify-content:center;align-items:flex-start;padding-top:6px;}
-  .clock{display:flex;gap:6px;}
-  .tile{position:relative;width:68px;height:94px;border-radius:8px;overflow:hidden;
-        background:linear-gradient(to bottom,var(--tile) 0 50%,var(--tile2) 50% 100%);
-        box-shadow:0 2px 6px rgba(32,40,74,.18);}
-  .tile::after{content:"";position:absolute;left:0;right:0;top:calc(50% - 1px);height:2px;background:var(--hinge);opacity:.55;}
+  :root{--tile:#4949E9;--digit:#FFFFFF;--label:#C9D0FF;--gap:max(3px,0.8vw);}
+  html,body{margin:0;height:100%;background:transparent;overflow:hidden;}
+  .clock{display:flex;gap:var(--gap);width:100vw;height:100vh;box-sizing:border-box;}
+  .tile{position:relative;flex:1;background:var(--tile);border-radius:max(2px,0.6vw);overflow:hidden;}
   .num{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;
-       font-family:'Oswald',sans-serif;font-weight:600;font-size:46px;color:var(--digit);letter-spacing:1px;padding-bottom:10px;}
-  .lab{position:absolute;bottom:6px;font-family:'IBM Plex Sans',sans-serif;font-size:7px;letter-spacing:.8px;
-       text-transform:uppercase;color:var(--label);}
-  .l{left:7px}.r{right:7px}
+       font-family:'Oswald',sans-serif;font-weight:700;color:var(--digit);line-height:1;
+       font-size:min(40vw,62vh);padding-bottom:8vh;letter-spacing:-0.02em;}
+  .lab{position:absolute;bottom:6vh;font-family:'Oswald',sans-serif;font-weight:600;
+       font-size:min(5vw,9vh);letter-spacing:0.02em;text-transform:uppercase;color:var(--label);}
+  .l{left:5%}.r{right:5%}
   .flip .num{animation:flip .45s ease-in-out;}
   @keyframes flip{0%{transform:rotateX(0)}50%{transform:rotateX(90deg)}100%{transform:rotateX(0)}}
 </style>
@@ -35,22 +26,17 @@
   <div class="tile" id="m"><div class="num" id="mn">00</div><div class="lab r" id="dy">MONDAY</div></div>
 </div>
 <script>
-  // ?h24=1 for 24-hour time. ?bg=pink for a pink version.
-  var q=new URLSearchParams(location.search);
-  if(q.get('bg')==='pink'){document.documentElement.style.setProperty('--tile','#FF56BE');document.documentElement.style.setProperty('--tile2','#F04AAF');document.documentElement.style.setProperty('--label','#FFD5EE');}
-  if(q.get('bg')==='navy'){document.documentElement.style.setProperty('--tile','#313D72');document.documentElement.style.setProperty('--tile2','#20284A');}
+  // Default: brand blue tiles, white digits. ?style=light: pale blue tiles, brand blue digits. ?bg=navy or ?bg=pink also work. ?h24=1 for 24-hour time.
+  var q=new URLSearchParams(location.search),r=document.documentElement.style;
+  if(q.get('style')==='light'){r.setProperty('--tile','#E4E6FC');r.setProperty('--digit','#4949E9');r.setProperty('--label','#4949E9');}
+  if(q.get('bg')==='navy'){r.setProperty('--tile','#20284A');}
+  if(q.get('bg')==='pink'){r.setProperty('--tile','#FF56BE');r.setProperty('--label','#FFD5EE');}
   var h24=q.get('h24')==='1';
   var days=['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
   function pad(n){return (n<10?'0':'')+n;}
   function set(id,tileId,val){var e=document.getElementById(id);if(e.textContent!==val){e.textContent=val;var t=document.getElementById(tileId);t.classList.remove('flip');void t.offsetWidth;t.classList.add('flip');}}
-  function tick(){
-    var d=new Date(),H=d.getHours();
-    var hh=h24?H:(H%12||12);
-    set('hn','h',pad(hh));
-    set('mn','m',pad(d.getMinutes()));
-    document.getElementById('ap').textContent=h24?'':(H<12?'AM':'PM');
-    document.getElementById('dy').textContent=days[d.getDay()];
-  }
+  function tick(){var d=new Date(),H=d.getHours();set('hn','h',pad(h24?H:(H%12||12)));set('mn','m',pad(d.getMinutes()));
+    document.getElementById('ap').textContent=h24?'':(H<12?'AM':'PM');document.getElementById('dy').textContent=days[d.getDay()];}
   tick();setInterval(tick,1000);
 </script>
 </body>
